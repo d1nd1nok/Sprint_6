@@ -1,10 +1,9 @@
+import allure
 from datetime import date, timedelta
 import random
 import time
 from selenium.webdriver.common.by import By
 from pages.base_page import BasePage
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 class OrderPage(BasePage):
@@ -45,32 +44,39 @@ class OrderPage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
 
-    def open(self, url):
-        self.driver.get(url)
 
-    def open_order_form(self, button):
-        element = self.wait_clickable(button)
-        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
-        element.click()
+    @allure.step("Открыть форму заказа")
+    def open_order_form(self, data):
+        button_value = data["button"]
+        if isinstance(button_value, str):
+            button_name = button_value.split('.')[-1]
+            button_locator = getattr(self, button_name)
+        else:
+            button_locator = button_value
 
+        self.scroll_into_view(button_locator)
+        self.click(button_locator)
+
+    @allure.step("Кликнуть на логотип Самоката")
     def click_scooter_logo(self):
         self.click(self.SCOOTER_LOGO)
 
+    @allure.step("Кликнуть на логотип Яндекса")
     def click_yandex_logo(self):
         self.click(self.YANDEX_LOGO)
     
+    @allure.step("Заполнить первый шаг заказа")
     def fill_first_step(self, data):
         self.type(self.NAME_INPUT, data["first_name"])
         self.type(self.LAST_NAME_INPUT, data["last_name"])
         self.type(self.ADDRESS_INPUT, data["address"])
-        self.wait_clickable(self.STATION_INPUT).click()
-        options = WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_all_elements_located(self.STATION_OPTIONS)
-        )
+        self.click(self.STATION_INPUT)
+        options = self.wait_all_visible(self.STATION_OPTIONS)
         options[0].click()
         self.type(self.PHONE_INPUT, data["phone"])
         self.wait_clickable(self.NEXT_BUTTON).click()
     
+    @allure.step("Заполнить второй шаг заказа")
     def fill_second_step(self, data):
         self.wait_clickable(self.DELIVERY_DATE_INPUT).click()
         self.wait_clickable(self.DATE_30_JUNE).click()
@@ -81,6 +87,7 @@ class OrderPage(BasePage):
         self.wait_clickable(self.FORM_ORDER_BUTTON).click()
         self.wait_clickable(self.CONFIRM_ORDER_BUTTON).click()
 
+    @allure.step("Проверить успешность оформления заказа")
     def is_order_successful(self):
         return self.wait_visible(self.SUCCESS_MODAL).is_displayed()
 

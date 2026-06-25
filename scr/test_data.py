@@ -12,14 +12,16 @@ FAQ_DATA = [
 
 ORDER_DATA = [
     {
-        "first_name": "Кан",
-        "last_name": "Максим",
+        "button": "OrderPage.HEADER_ORDER_BUTTON",
+        "first_name": "Серик",
+        "last_name": "Арнат",
         "address": "Алматы, Абай 10",
         "metro": "Сокольники",
         "phone": "77011234567",
         "comment":"фывпаорлпло"
     },
     {
+        "button": "OrderPage.FOOTER_ORDER_BUTTON",
         "first_name": "Самат",
         "last_name": "Дауренов",
         "address": "Астана, Туран 25",
